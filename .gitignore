@@ -9,5 +9,12 @@ encodings.xml
 scala_settings.xml
 misc.xml
 vcs.xml
+settings.xml
 libraries
 inspectionProfiles
+**/.surefire-*
+**/target/*
+**/.surefire-*
+**/.project
+**/.classpath
+**/.settings/*

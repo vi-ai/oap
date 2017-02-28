@@ -67,7 +67,7 @@
         </repository>
         <repository>
             <id>oap</id>
-            <url>http://mvn.oaplatform.org/artifactory/oap/</url>
+            <url>https://artifactory.viewster.com/artifactory/oap/</url>
         </repository>
     </repositories>
 
