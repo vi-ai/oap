@@ -13,6 +13,7 @@ settings.xml
 libraries
 inspectionProfiles
 **/.surefire-*
+.idea/*
 **/target/*
 **/.surefire-*
 **/.project
