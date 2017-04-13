@@ -45,6 +45,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 import com.fasterxml.jackson.datatype.joda.deser.DateTimeDeserializer;
+import com.fasterxml.jackson.datatype.joda.ser.DateTimeSerializer;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.jasonclawson.jackson.dataformat.hocon.HoconFactory;
@@ -54,6 +55,7 @@ import oap.io.IoStreams;
 import oap.io.Resources;
 import oap.util.Dates;
 import oap.util.Strings;
+import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 
 import java.io.IOException;
@@ -65,6 +67,8 @@ import java.util.Map;
 
 @Slf4j
 public class Binder {
+    private static final JacksonJodaDateFormat jodaDateFormat = new JacksonJodaDateFormat( Dates.FORMAT_SIMPLE );
+
     public static final Binder hocon =
         new Binder( initialize( new ObjectMapper( new HoconFactoryWithSystemProperties( log ) ), false ) );
     public static final Binder hoconWithoutSystemProperties =
@@ -73,7 +77,6 @@ public class Binder {
     public static final Binder jsonWithTyping = new Binder( initialize( new ObjectMapper(), false ) );
     public static final Binder xml = new Binder( initialize( new XmlMapper(), false ) );
     public static final Binder xmlWithTyping = new Binder( initialize( new XmlMapper(), true ) );
-    private static final JacksonJodaDateFormat JACKSON_DATE_FORMAT = new JacksonJodaDateFormat( Dates.FORMAT_FULL );
     private ObjectMapper mapper;
 
     public Binder( ObjectMapper mapper ) {
@@ -97,7 +100,9 @@ public class Binder {
         mapper.getSerializationConfig().with( introspector );
         mapper.registerModule( new AfterburnerModule() );
         mapper.registerModule( new Jdk8Module().configureAbsentsAsNulls( true ) );
-        mapper.registerModule( new JodaModule() );
+        mapper.registerModule( new JodaModule()
+            .addDeserializer( DateTime.class, forType( DateTime.class ) )
+            .addSerializer( DateTime.class, new DateTimeSerializer( jodaDateFormat ) ) );
         mapper.registerModule( new ParameterNamesModule( JsonCreator.Mode.DEFAULT ) );
         mapper.enable( DeserializationFeature.USE_LONG_FOR_INTS );
         mapper.enable( JsonParser.Feature.ALLOW_SINGLE_QUOTES );
@@ -105,7 +110,7 @@ public class Binder {
         mapper.disable( SerializationFeature.WRITE_DATES_AS_TIMESTAMPS );
         mapper.disable( SerializationFeature.WRITE_EMPTY_JSON_ARRAYS );
         mapper.disable( SerializationFeature.FAIL_ON_EMPTY_BEANS );
-        mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
+        mapper.configure( JsonGenerator.Feature.AUTO_CLOSE_TARGET, false );
         mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
         mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
         mapper.registerModule( new OapJsonModule() );
@@ -118,7 +123,7 @@ public class Binder {
 
     @SuppressWarnings( "unchecked" )
     private static <T extends ReadableInstant> JsonDeserializer<T> forType( Class<T> cls ) {
-        return ( JsonDeserializer<T> ) new DateTimeDeserializer( cls, JACKSON_DATE_FORMAT );
+        return ( JsonDeserializer<T> ) new DateTimeDeserializer( cls, jodaDateFormat );
     }
 
     public final JsonGenerator getJsonGenerator( Path path ) throws JsonException {

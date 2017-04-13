@@ -83,10 +83,10 @@ public class PrimitiveTypeTest extends AbstractSchemaTest {
     public void test_date() {
         String schema = "{\"type\": \"date\"}";
 
-        assertOk( schema, "\"2016-01-01T00:00:00.000Z\"" );
+        assertOk( schema, "\"2016-01-01T00:00:00\"" );
         assertOk( schema, "null" );
-        assertFailure( schema, "\"2016-01-01TT00:00:00\"",
-            "Invalid format: \"2016-01-01TT00:00:00\" is malformed at \"T00:00:00\"" );
+        assertFailure( schema, "\"2016-01-01TT00:00:00.000Z\"",
+            "Invalid format: \"2016-01-01TT00:00:00.000Z\" is malformed at \"T00:00:00.000Z\"" );
         assertFailure( schema, "{}",
             "instance is resolve type object, which is none resolve the allowed primitive types ([date])" );
     }

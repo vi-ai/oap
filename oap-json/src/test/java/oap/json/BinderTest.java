@@ -165,7 +165,8 @@ public class BinderTest extends AbstractTest {
 
     @Test
     public void bindDateTime() {
-        assertBind( DateTimeBean.class, new DateTimeBean( Dates.nowUtc() ) );
+        assertBind( DateTimeBean.class,
+            new DateTimeBean( Dates.nowUtc().secondOfDay().roundFloorCopy() ));
     }
 
     @Test
@@ -473,8 +474,10 @@ class LongBean {
 class DateTimeBean {
     DateTime date;
 
-    @JsonCreator
     public DateTimeBean( DateTime date ) {
         this.date = date;
+    }
+
+    public DateTimeBean() {
     }
 }
