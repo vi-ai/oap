@@ -163,7 +163,7 @@ public class JsonDiffTest extends AbstractSchemaTest {
             "}}";
 
         assertThat( __diff( schema, "{\"test\":[\"old value\"]}", "{\"test\":[\"old value\",\"new value\"]}" ) )
-            .containsOnly( __newA( "test", "[\"new value\"]" ) );
+            .containsOnly( __updA( "test", "[\"old value\"]", "[\"old value\",\"new value\"]" ) );
     }
 
     @Test
@@ -196,7 +196,7 @@ public class JsonDiffTest extends AbstractSchemaTest {
             "}}";
 
         assertThat( __diff( schema, "{\"test\":[\"old value\", \"old value 2\"]}", "{\"test\":[\"old value 2\"]}" ) )
-            .containsOnly( __delA( "test", "[\"old value\"]" ) );
+            .containsOnly( __updA( "test", "[\"old value\",\"old value 2\"]", "[\"old value 2\"]" ) );
     }
 
     @Test
@@ -213,7 +213,7 @@ public class JsonDiffTest extends AbstractSchemaTest {
             "}}";
 
         assertThat( __diff( schema, "{\"test\":[\"old value\", \"old value 2\"]}", "{\"test\":[\"old value 2\", \"new value\"]}" ) )
-            .containsOnly( __updA( "test", "[\"old value\"]", "[\"new value\"]" ) );
+            .containsOnly( __updA( "test", "[\"old value\",\"old value 2\"]", "[\"old value 2\",\"new value\"]" ) );
     }
 
     @Test
@@ -325,10 +325,6 @@ public class JsonDiffTest extends AbstractSchemaTest {
 
     private JsonDiff.Line __delO( String path, String value ) {
         return __del( path, JsonDiff.Line.LineType.OBJECT, of( value ), empty() );
-    }
-
-    private JsonDiff.Line __delA( String path, String value ) {
-        return __del( path, JsonDiff.Line.LineType.ARRAY, of( value ), empty() );
     }
 
     private JsonDiff.Line __del( String path, JsonDiff.Line.LineType object, Optional<String> value2, Optional<String> empty ) {
