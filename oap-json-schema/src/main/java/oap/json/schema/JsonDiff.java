@@ -36,7 +36,6 @@ import java.util.*;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.collections4.CollectionUtils.subtract;
 
 public class JsonDiff {
     private final ArrayList<Line> diff;
@@ -85,9 +84,6 @@ public class JsonDiff {
         final List<?> toList = ( List<?> ) to;
         final List<?> fromList = ( List<?> ) from;
 
-        final Collection<?> diffDel = subtract( fromList, toList );
-        final Collection<?> diffAdd = subtract( toList, fromList );
-
         final SchemaAST items = schema.items;
         if( items instanceof ObjectSchemaAST ) {
             final String idField = schema.idField
@@ -126,7 +122,7 @@ public class JsonDiff {
             throw new IllegalArgumentException( prefix + ": sub-array" );
         } else {
 
-            diffField( prefix, schema, result, diffAdd.isEmpty() ? null : diffAdd, diffDel.isEmpty() ? null : diffDel );
+            diffField( prefix, schema, result, toList.isEmpty() ? null : toList, fromList.isEmpty() ? null : fromList );
         }
     }
 
