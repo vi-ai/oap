@@ -7,23 +7,21 @@ ENV SERVICE_KEYS_DIR=/opt/${oap.service.name}/keys
 ENV SERVICE_DATA_DIR=/var/lib/${oap.service.name}
 ENV SERVICE_LOG_DIR=/var/log/${oap.service.name}
 
-WORKDIR $SERVICE_WORK_DIR
 
 ENV UID 0
 
-# copy keys
-COPY src/opt/${oap.service.name}/keys/* /opt/${oap.service.name}/keys/
+RUN mkdir -p $SERVICE_WORK_DIR
 
-# copy libs
-COPY src/opt/${oap.service.name}/lib/*.jar /opt/${oap.service.name}/lib/
+WORKDIR $SERVICE_WORK_DIR
 
-# copy shell scripts
-COPY src/opt/${oap.service.name}/bin/*.sh /opt/${oap.service.name}/bin/
-
+# copy directories structure
+COPY src/ /
 
 VOLUME $SERVICE_CONFIG_DIR
+VOLUME $SERVICE_KEYS_DIR
 VOLUME $SERVICE_DATA_DIR
 VOLUME $SERVICE_LOG_DIR
+
 
 
 ENTRYPOINT ["/opt/${oap.service.name}/bin/${oap.service.name}.sh", "--run"]
