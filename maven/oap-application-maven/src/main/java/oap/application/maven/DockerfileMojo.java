@@ -42,9 +42,9 @@ import java.util.Properties;
 
 import static java.nio.file.attribute.PosixFilePermission.*;
 
-@Mojo( name = "startup-scripts", defaultPhase = LifecyclePhase.PREPARE_PACKAGE )
-public class StartupScriptsMojo extends AbstractMojo {
-    @Parameter( defaultValue = "${project.build.directory}/oap/scripts" )
+@Mojo( name = "dockerfile", defaultPhase = LifecyclePhase.PREPARE_PACKAGE )
+public class DockerfileMojo extends AbstractMojo {
+    @Parameter( defaultValue = "${project.build.directory}/docker" )
     private String destinationDirectory;
 
     @Parameter( defaultValue = "false" )
@@ -55,22 +55,19 @@ public class StartupScriptsMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Properties properties = project.getProperties();
-        String serviceBin = properties.getOrDefault( "oap.service.home", "/opt/oap-service" ) + "/bin";
-        Path functions = Paths.get( destinationDirectory, serviceBin, "functions.sh" );
-        Resources.readString( getClass(), "/bin/functions.sh" )
-            .ifPresent( value -> Files.writeString( functions, value ) );
+
         PosixFilePermission[] permissions = {
             OWNER_EXECUTE, OWNER_READ, OWNER_WRITE,
             GROUP_EXECUTE, GROUP_READ,
             OTHERS_EXECUTE, OTHERS_READ };
-        script( "/bin/oap.sh", serviceBin, ".sh", permissions );
+
+        dockerfile( "/docker/Dockerfile", "Dockerfile", permissions );
     }
 
-    private void script( String script, String preffix, String suffix, PosixFilePermission... permissions ) {
+    private void dockerfile( String resourceFile, String dockerfile, PosixFilePermission... permissions ) {
         Properties properties = project.getProperties();
-        Path path = Paths.get( destinationDirectory, preffix, properties.getOrDefault( "oap.service.name", "oap-service" ) + suffix );
-        Resources.readString( getClass(), script )
+        Path path = Paths.get( destinationDirectory, dockerfile );
+        Resources.readString( getClass(), resourceFile )
             .ifPresent( value -> Files.writeString( path,
                 Strings.substitute( value, properties::getProperty ) ) );
         if( permissions.length > 0 ) {

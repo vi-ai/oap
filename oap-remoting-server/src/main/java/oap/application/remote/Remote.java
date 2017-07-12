@@ -54,15 +54,21 @@ public class Remote implements Handler {
 
     private final HttpServer server;
     private final String context;
+    private final Protocol protocol;
 
     public Remote( FST.SerializationMethod serialization, final HttpServer server, final String context ) {
+        this(serialization, server, context, Protocol.HTTP);
+    }
+
+    public Remote( FST.SerializationMethod serialization, final HttpServer server, final String context, Protocol protocol ) {
         this.serialization = serialization;
         this.server = server;
         this.context = context;
+        this.protocol = protocol;
     }
 
     public void start() {
-        server.bind( context, cors, this, Protocol.HTTPS );
+        server.bind( context, cors, this, protocol );
     }
 
     @Override
