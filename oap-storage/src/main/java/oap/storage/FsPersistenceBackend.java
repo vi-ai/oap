@@ -52,7 +52,7 @@ import static oap.util.Maps.Collectors.toConcurrentMap;
 import static oap.util.Pair.__;
 import static org.slf4j.LoggerFactory.getLogger;
 
-class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Storage.DataListener<T> {
+public class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Storage.DataListener<T> {
     private final Path path;
     private final BiFunction<Path, T, Path> fsResolve;
     private final int version;
@@ -73,7 +73,7 @@ class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Stora
         this.storage.addDataListener( this );
     }
 
-    private void load() {
+    protected void load() {
         Files.ensureDirectory( path );
         List<Path> paths = Files.deepCollect( path, p -> p.getFileName().toString().endsWith( ".json" ) );
         log.debug( "found {} files", paths.size() );
@@ -105,7 +105,7 @@ class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Stora
         log.info( storage.data.size() + " object(s) loaded." );
     }
 
-    private Path migration( Path path ) {
+    protected Path migration( Path path ) {
         JsonMetadata oldV = new JsonMetadata( Binder.json.unmarshal( new TypeReference<Map<String, Object>>() {
         }, path ) );
 
@@ -129,7 +129,7 @@ class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Stora
             .orElseThrow( () -> new FileStorageMigrationException( "migration from version " + fn + " not found" ) );
     }
 
-    private synchronized void fsync( long last ) {
+    protected synchronized void fsync( long last ) {
         log.trace( "fsync: last: {}, storage size: {}", last, storage.data.size() );
 
         storage.data.values()
@@ -144,13 +144,13 @@ class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Stora
             } );
     }
 
-    private Path filenameFor( T object, long version ) {
+    protected Path filenameFor( T object, long version ) {
         final String ver = this.version > 0 ? ".v" + version : "";
         return fsResolve.apply( this.path, object )
             .resolve( this.storage.identifier.get( object ) + ver + ".json" );
     }
 
-    public synchronized void delete( T id ) {
+    protected synchronized void delete( T id ) {
         Path path = filenameFor( id, version );
         Files.delete( path );
     }
@@ -177,7 +177,7 @@ class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Stora
     }
 
     @ToString
-    private static class Persisted {
+    protected static class Persisted {
         private static final Pattern PATTERN_VERSION = Pattern.compile( "(.+)\\.v(\\d+)\\.json" );
         private final Path path;
         private final String id;

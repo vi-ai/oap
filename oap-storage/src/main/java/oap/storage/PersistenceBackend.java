@@ -25,7 +25,7 @@ package oap.storage;
 
 import java.io.Closeable;
 
-interface PersistenceBackend<T> extends Closeable {
+public interface PersistenceBackend<T> extends Closeable {
    @Override
    void close();
 }

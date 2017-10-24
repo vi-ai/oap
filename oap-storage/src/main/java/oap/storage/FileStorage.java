@@ -41,7 +41,7 @@ import static oap.util.Lists.empty;
  */
 public class FileStorage<T> extends MemoryStorage<T> {
    private static final int VERSION = 0;
-   private PersistenceBackend<T> persistence;
+   protected PersistenceBackend<T> persistence;
 
    /**
     * @deprecated use {@link #FileStorage(Path, Identifier, long, int, List)}} instead.
