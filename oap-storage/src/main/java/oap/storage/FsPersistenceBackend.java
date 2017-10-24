@@ -179,10 +179,11 @@ public class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable
     @ToString
     protected static class Persisted {
         public final long version;
+        public final Path path;
+        public final String id;
 
         private static final Pattern PATTERN_VERSION = Pattern.compile( "(.+)\\.v(\\d+)\\.json" );
-        private final Path path;
-        private final String id;
+
 
         Persisted( Path path, String id, long version ) {
             this.path = path;
