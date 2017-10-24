@@ -53,13 +53,13 @@ import static oap.util.Pair.__;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable, Storage.DataListener<T> {
-    private final Path path;
-    private final BiFunction<Path, T, Path> fsResolve;
-    private final int version;
-    private final List<FileStorageMigration> migrations;
-    private final Logger log;
-    private MemoryStorage<T> storage;
-    private PeriodicScheduled scheduled;
+    protected final Path path;
+    protected final BiFunction<Path, T, Path> fsResolve;
+    protected final int version;
+    protected final List<FileStorageMigration> migrations;
+    protected final Logger log;
+    protected MemoryStorage<T> storage;
+    protected PeriodicScheduled scheduled;
 
     public FsPersistenceBackend( Path path, BiFunction<Path, T, Path> fsResolve, long fsync, int version, List<FileStorageMigration> migrations, MemoryStorage<T> storage ) {
         this.path = path;
