@@ -178,10 +178,11 @@ public class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable
 
     @ToString
     protected static class Persisted {
+        public final long version;
+
         private static final Pattern PATTERN_VERSION = Pattern.compile( "(.+)\\.v(\\d+)\\.json" );
         private final Path path;
         private final String id;
-        private final long version;
 
         Persisted( Path path, String id, long version ) {
             this.path = path;
@@ -189,7 +190,7 @@ public class FsPersistenceBackend<T> implements PersistenceBackend<T>, Closeable
             this.version = version;
         }
 
-        static Persisted valueOf( Path path ) {
+        public static Persisted valueOf( Path path ) {
             String name = path.getFileName().toString();
             final Matcher matcher = PATTERN_VERSION.matcher( name );
             return matcher.matches()
