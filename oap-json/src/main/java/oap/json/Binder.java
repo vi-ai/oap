@@ -102,7 +102,7 @@ public class Binder {
         mapper.registerModule( new Jdk8Module().configureAbsentsAsNulls( true ) );
         mapper.registerModule( new JodaModule()
             .addDeserializer( DateTime.class, forType( DateTime.class ) )
-            .addSerializer( DateTime.class, new DateTimeSerializer( jodaDateFormat ) ) );
+            .addSerializer( DateTime.class, new DateTimeSerializer( jodaDateFormat, 0 ) ) );
         mapper.registerModule( new ParameterNamesModule( JsonCreator.Mode.DEFAULT ) );
         mapper.enable( DeserializationFeature.USE_LONG_FOR_INTS );
         mapper.enable( JsonParser.Feature.ALLOW_SINGLE_QUOTES );
