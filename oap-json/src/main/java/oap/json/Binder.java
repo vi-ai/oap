@@ -32,6 +32,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -74,7 +75,8 @@ public class Binder {
     public static final Binder hoconWithoutSystemProperties =
         new Binder( initialize( new ObjectMapper( new HoconFactory() ), false ) );
     public static final Binder json = new Binder( initialize( new ObjectMapper(), false ) );
-    public static final Binder jsonWithTyping = new Binder( initialize( new ObjectMapper(), false ) );
+    public static final Binder jsonWithFullInclusion = new Binder( initialize( new ObjectMapper(), false, JsonInclude.Include.ALWAYS ) );
+    public static final Binder jsonWithTyping = new Binder( initialize( new ObjectMapper(), true ) );
     public static final Binder xml = new Binder( initialize( new XmlMapper(), false ) );
     public static final Binder xmlWithTyping = new Binder( initialize( new XmlMapper(), true ) );
     private ObjectMapper mapper;
@@ -92,6 +94,10 @@ public class Binder {
     }
 
     private static ObjectMapper initialize( ObjectMapper mapper, boolean defaultTyping ) {
+        return initialize( mapper, defaultTyping, JsonInclude.Include.NON_NULL );
+    }
+
+    private static ObjectMapper initialize( ObjectMapper mapper, boolean defaultTyping, JsonInclude.Include include ) {
         if( mapper instanceof XmlMapper ) {
             ( ( XmlMapper ) mapper ).setDefaultUseWrapper( false );
         }
@@ -112,7 +118,7 @@ public class Binder {
         mapper.disable( SerializationFeature.FAIL_ON_EMPTY_BEANS );
         mapper.configure( JsonGenerator.Feature.AUTO_CLOSE_TARGET, false );
         mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
-        mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
+        mapper.setSerializationInclusion( include );
         mapper.registerModule( new OapJsonModule() );
 
         if( defaultTyping )
@@ -271,7 +277,7 @@ public class Binder {
     public void update( Object obj, Map<String, Object> values ) throws JsonException {
         try {
             final String marshal = json.marshal( obj );
-            final String vs = json.marshal( values );
+            final String vs = jsonWithFullInclusion.marshal( values );
 
             hoconWithConfig( vs ).mapper.readerForUpdating( obj ).readValue( marshal );
         } catch( IOException e ) {
