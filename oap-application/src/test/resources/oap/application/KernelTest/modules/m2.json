@@ -39,6 +39,19 @@
         "ServiceOne",
         "ServiceTwo"
       ]
+    },
+    "ServiceDepsMap": {
+      "implementation": "oap.application.ServiceDepsMap",
+      "parameters": {
+        "deps": {
+          "one": "@service:ServiceOne",
+          "two": "@service:ServiceTwo"
+        }
+      },
+      "dependsOn": [
+        "ServiceOne",
+        "ServiceTwo"
+      ]
     }
   }
 }

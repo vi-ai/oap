@@ -29,7 +29,9 @@ import oap.util.Maps;
 import org.testng.annotations.Test;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static oap.testng.Asserts.assertEventually;
 import static oap.testng.Asserts.pathOfTestResource;
@@ -74,6 +76,13 @@ public class KernelTest extends AbstractTest {
                 ServiceDepsList depsList = Application.service( ServiceDepsList.class );
                 assertNotNull( depsList );
                 assertThat( depsList.deps ).contains( one, two );
+
+                Map<String, Object> expectedDepsMap = new HashMap<>();
+                expectedDepsMap.put( "one", one );
+                expectedDepsMap.put( "two", two );
+                ServiceDepsMap depsMap = Application.service( ServiceDepsMap.class );
+                assertNotNull( depsMap );
+                assertThat( depsMap.deps ).isEqualTo( expectedDepsMap );
 
                 assertThat( one.listener ).isSameAs( two );
             } );

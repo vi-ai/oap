@@ -84,7 +84,7 @@ public class Kernel {
                         instance = reflect.newInstance( service.parameters );
                         initializeListeners( service.listen, instance );
                     } catch( ReflectException e ) {
-                        log.info( "service name = {}, remoteName = {}, profile = {}", service.name, service.remoteName, service.profile );
+                        log.error( "Failed to initialize service: name = {}, remoteName = {}, profile = {}", service.name, service.remoteName, service.profile, e );
                         throw e;
                     }
                 } else instance = RemoteInvocationHandler.proxy(
@@ -125,7 +125,7 @@ public class Kernel {
         initializeServiceLinks( name, service.listen );
     }
 
-    private void initializeServiceLinks( String name, LinkedHashMap<String, Object> map ) {
+    private void initializeServiceLinks( String name, Map<String, Object> map ) {
         for( Map.Entry<String, Object> entry : map.entrySet() ) {
             final Object value = entry.getValue();
             final String key = entry.getKey();
@@ -134,6 +134,8 @@ public class Kernel {
             else if( value instanceof List<?> ) {
                 ListIterator<Object> it = ( ( List<Object> ) value ).listIterator();
                 while( it.hasNext() ) it.set( resolve( name, key, it.next() ) );
+            } else if (value instanceof Map) {
+                initializeServiceLinks(name, (Map<String, Object>)value);
             }
         }
     }
